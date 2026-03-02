@@ -1,0 +1,28 @@
+
+SIT315 –  Programming Paradigms
+
+ Seminar 2- Real-time Systems - part 2
+Reflection Report
+
+System Architecture and Logic:
+The system follows a Sense → Think → Act architecture. In the sensing stage, the push-button and PIR provide digital event signals, the ultrasonic sensor measures distance, and the LDR measures ambient light level. Each sensor captures a different environmental condition, allowing the system to monitor motion, proximity, and lighting in real time.
+In the thinking stage, the program combines these inputs using a structured decision rule. The alarm activates only when the PIR detects motion and either the button was pressed recently or an object is closer than 20 cm. This multi-condition logic reduces false alarms and demonstrates sensor fusion, where multiple inputs are evaluated before triggering an action. Timer-based checks are also used to manage event timing and periodic LDR sampling without blocking the system.
+In the acting stage, the system controls four LEDs and a buzzer to represent system status. Each sensor has a dedicated LED indicator, and the alarm LED activates only when the full condition is satisfied. This layered structure makes the design organised, easy to debug, and clear during demonstration, showing a properly designed embedded system rather than simple sequential programming.
+
+Interrupt Configuration and Usage
+Three hardware interrupt mechanisms were used to ensure fast response and efficient processing. Instead of continuously polling sensors, interrupts allow the microcontroller to react immediately to important events. All interrupt service routines (ISRs) were kept minimal and only set volatile flags, while the main loop handled processing and outputs.
+The External Interrupt (INT0 on D2) was used for the PIR sensor. It triggers on the RISING edge when motion is detected. The ISR sets a motion flag, and the main loop then activates the PIR LED, buzzer, and logs the event. This ensures instant motion detection without heavy processing inside the ISR.
+The Pin-Change Interrupt (PCINT on D8) was used for the push-button. When the button state changes, the ISR sets a flag. The main loop performs debouncing and updates the user state. This avoids continuous button polling and improves CPU efficiency.
+The Timer1 Compare Interrupt (CTC mode, 1-second interval) was configured for periodic tasks. Every second, a flag is set to read the LDR, update indicators, and manage timing checks. Using a hardware timer ensures consistent timing without using delay functions.
+Overall, separating ISR logic from main processing improves responsiveness, stability, and system structure.
+
+Issues Encountered and How They Were Resolved
+Several issues were encountered during development. The LDR initially gave constant readings due to incorrect voltage divider wiring. Rewiring it correctly between 5V, A0, and a 10kΩ resistor to ground resolved the problem.
+The ultrasonic sensor caused delays because pulseIn() can block execution. Adding a timeout and scheduling readings at intervals reduced blocking and improved responsiveness.
+The PIR interrupt initially triggered outputs but did not always print messages on the Serial Monitor. This was resolved by ensuring the ISR only set a volatile flag and the main loop handled printing and clearing the flag.
+Minor breadboard wiring issues, such as incorrect LED placement and loose ground connections, were fixed through systematic testing of each component individually. By debugging methodically and improving interrupt design, the final system became stable, responsive, and suitable for a distinction-level demonstration.
+
+Github Link For code and diagram:
+https://github.com/YograjSikka09/SIT315---Programming-Paradigms.git
+TinkerCad Link:
+https://www.tinkercad.com/things/4C1QT6XCAm5-task-m1t1d?sharecode=wEhn-CbXoxsElpW_hXWsSwyjOY1zcWGQHBSuPw2lPOs
